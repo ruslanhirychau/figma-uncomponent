@@ -1,22 +1,22 @@
-// This file holds the main code for the plugins. It has access to the *document*.
-// You can access browser APIs such as the network by creating a UI which contains
-// a full browser environment (see documentation).
-for (const node of figma.currentPage.selection) {
-    switch (node.type) {
+for (const selectedNode of figma.currentPage.selection) {
+    switch (selectedNode.type) {
         case 'COMPONENT':
-            const instance = node.createInstance();
-            instance.x = node.x;
-            instance.y = node.y;
-            node.remove();
-            instance.detachInstance();
+            const parent = selectedNode.parent;
+            const newInstance = selectedNode.createInstance();
+            parent.appendChild(newInstance);
+
+            newInstance.x = selectedNode.x;
+            newInstance.y = selectedNode.y;
+
+            newInstance.detachInstance();
+            selectedNode.remove();
             break;
         case 'INSTANCE':
-            node.detachInstance();
+            selectedNode.detachInstance();
             break;
         default:
-            figma.notify(String(node.name) + " is neither a component nor an instance");
+            figma.notify(String(selectedNode.name) + " is neither a component nor an instance");
     }
 }
-// Make sure to close the plugin when you're done. Otherwise the plugin will
-// keep running, which shows the cancel button at the bottom of the screen.
+
 figma.closePlugin();

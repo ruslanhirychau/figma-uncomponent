@@ -2,5 +2,6 @@
   "name": "Uncomponent",
   "id": "931839698966723759",
   "api": "1.0.0",
-  "main": "code.js"
+  "main": "code.js",
+  "editorType": ["figma"]
 }
