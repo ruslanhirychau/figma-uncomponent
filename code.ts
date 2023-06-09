@@ -1,28 +1,43 @@
-// This file holds the main code for the plugins. It has access to the *document*.
-// You can access browser APIs such as the network by creating a UI which contains
-// a full browser environment (see documentation).
+// Loop through each selected node on the current page
+for (const selectedNode of figma.currentPage.selection) {
+  // Check the type of the selected node
+  switch (selectedNode.type) {
+    // If the selected node is a component
+    case "COMPONENT":
+      // Get the parent of the selected component
+      const parent = selectedNode.parent;
 
-for (const node of figma.currentPage.selection) 
-{
-    switch (node.type) 
-    {
-        case 'COMPONENT':
-            const instance = node.createInstance();
-            instance.x = node.x;
-            instance.y = node.y;
-    
-            node.remove();
-            instance.detachInstance();
-          break;
-        case 'INSTANCE':
-            node.detachInstance();
-          break;
-        default:
-          figma.notify(String(node.name) + " is neither a component nor an instance");
-    }      
+      // Create a new instance of the selected component
+      const newInstance = selectedNode.createInstance();
+
+      // Add the new instance as a child of the selected component's parent
+      const objectIndex = parent.children.indexOf(selectedNode);
+      parent.insertChild(objectIndex, newInstance);
+
+      // Set the position of the new instance to the position of the selected component
+      newInstance.x = selectedNode.x;
+      newInstance.y = selectedNode.y;
+
+      // Detach the new instance from the selected component
+      newInstance.detachInstance();
+
+      // Remove the selected component from the page
+      selectedNode.remove();
+      break;
+
+    // If the selected node is an instance
+    case "INSTANCE":
+      // Detach the instance from its parent
+      selectedNode.detachInstance();
+      break;
+
+    // If the selected node is neither a component nor an instance
+    default:
+      figma.notify(
+        String(selectedNode.name) + " is neither a component nor an instance"
+      );
+  }
 }
 
-// Make sure to close the plugin when you're done. Otherwise the plugin will
-// keep running, which shows the cancel button at the bottom of the screen.
-
-figma.closePlugin()
+// Close the plugin
+figma.closePlugin();
